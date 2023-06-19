@@ -1,0 +1,6 @@
+{
+    "require": {
+        "aternos/model": "^3.0",
+        "miladrahimi/phprouter": "5.*"
+    }
+}
