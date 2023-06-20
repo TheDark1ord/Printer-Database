@@ -1,6 +1,7 @@
 {
     "require": {
         "aternos/model": "^3.0",
-        "miladrahimi/phprouter": "5.*"
+        "miladrahimi/phprouter": "5.*",
+        "laminas/laminas-validator": "^2.5"
     }
 }

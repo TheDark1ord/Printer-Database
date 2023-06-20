@@ -3,16 +3,16 @@
 
     use Aternos\Model\Driver\Mysqli\Mysqli;
 
-    class Printer extends \Aternos\Model\GenericModel {
+    class OriginalPart extends \Aternos\Model\GenericModel {
         protected static bool $registry = true;
         protected static array $drivers = [
             Mysqli::ID,
         ];
 
         public static function getName(): string {
-            return "printers";
+            return "original_parts";
         }
-        public $ID;
-        public $Model;
+        public $PartName;
+        public $PrinterID;
     }
 ?>

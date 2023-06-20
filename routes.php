@@ -9,14 +9,32 @@ use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Response\TextResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
+use MiladRahimi\PhpRouter\View\View;
 
 require_once(__DIR__ . "\\Http\\Controllers\\CreationController.php");
 
 $router = Router::create();
+$router->setupView(__DIR__ . "/views/");
+
+# ROUTE DEFINITION
 
 $router->post('/create/printer', [CreationController::class, 'printer']);
 $router->post('/create/part', [CreationController::class, 'part']);
 $router->post('/create/part-type', [CreationController::class, 'part_type']);
+
+# ROUTE DEFINITION
+
+#TEST ROUTES
+
+$router->get('/create/printer', function (View $view) {
+    return $view->make('create_printer_form');
+});
+
+$router->get('/create/part', function (View $view) {
+    return $view->make('create_part_form');
+});
+
+#TEST ROUTES
 
 try {
     $router->dispatch();

@@ -1,0 +1,22 @@
+<meta charset=utf-8>
+<h1>Новая поставка</h1>
+<div>
+    <form action="/create/part" method="post">
+        <input type="text" placeholder="Название детали" name="PartName"><br>
+        <input type="text" placeholder="Тип детали" name="PartType"><br>
+
+        <label for="Count">Сколько поставили</label>
+        <input type="number" min=1 name="Count"><br>
+
+        <label for="ShipmentDate">Когда поставили</label>
+        <input type="datetime-local" id="shipment-date" name="ShipmentDate"><br>
+        <script>
+            let currentTime = new Date();
+            console.log(currentTime);
+            document.getElementById('shipment-date').value = currentTime;
+            document.getElementById('shipment-date').max = currentTime;
+        </script>
+
+        <input type="Submit">
+    </form>
+</div>
