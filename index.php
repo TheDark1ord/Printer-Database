@@ -13,16 +13,16 @@ DriverRegistry::getInstance()->registerDriver($driver);
 
 $conn = mysqli_connect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME, DB_PORT);
 if (!$conn) {
-    echo 'Could not connect to the database';
+    die('Could not connect to the database');
 }
 #execute migrations for missing tables
 $database_tables = [
     "printers",
     "part_types",
     "parts",
-    "original_parts",
-    "non_original_parts",
+    "parts_association",
 ];
+
 $table_check_query = "SELECT TABLE_NAME FROM information_schema.tables WHERE table_schema = '%s'";
 $tables = $conn->query(sprintf($table_check_query, DB_NAME))->fetch_all($mode=2);
 foreach ($database_tables as $table) {
@@ -30,9 +30,13 @@ foreach ($database_tables as $table) {
         $migration_file_name = "create_{$table}_table.sql";
         $migration_querry = file_get_contents("Database\\Querries\\Migrations\\" . $migration_file_name);
         $conn->multi_query($migration_querry);
+
+        $err = mysqli_error($conn);
+        if ($err != null) {
+            echo $err . "<br>";
+        }
     }
 }
-$conn->close();
 
 include("routes.php");
 ?>
