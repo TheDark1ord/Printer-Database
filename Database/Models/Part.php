@@ -18,6 +18,7 @@
         public function getPrinters() {
         }
 
+        public $ID;
         public $PartName;
         public $ShipmentDate;
         public $PartType;

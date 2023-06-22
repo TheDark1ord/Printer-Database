@@ -3,17 +3,22 @@
 
     use Aternos\Model\Driver\Mysqli\Mysqli;
 
-    class NonOriginalPart extends \Aternos\Model\GenericModel {
+    class PartAssociasion extends \Aternos\Model\GenericModel {
         protected static bool $registry = true;
         protected static array $drivers = [
             Mysqli::ID,
         ];
 
         public static function getName(): string {
-            return "non_original_parts";
+            return "parts_association";
         }
-
-        public $PartName;
+        public $PartID;
         public $PrinterID;
+        public $PrinterModel;
+        public $IsOriginal;
+
+        public function getId(): mixed {
+            return 1;
+        }
     }
 ?>

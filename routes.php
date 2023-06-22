@@ -12,6 +12,7 @@ use Laminas\Diactoros\Response\RedirectResponse;
 use MiladRahimi\PhpRouter\View\View;
 
 require_once(__DIR__ . "\\Http\\Controllers\\CreationController.php");
+require_once(__DIR__ . "\\Http\\Controllers\\RequestController.php");
 
 $router = Router::create();
 $router->setupView(__DIR__ . "/views/");
@@ -21,6 +22,8 @@ $router->setupView(__DIR__ . "/views/");
 $router->post('/create/printer', [CreationController::class, 'printer']);
 $router->post('/create/part', [CreationController::class, 'part']);
 $router->post('/create/part-type', [CreationController::class, 'part_type']);
+
+$router->get("/get/parts", [RequestController::class, 'parts']);
 
 # ROUTE DEFINITION
 
@@ -32,6 +35,10 @@ $router->get('/create/printer', function (View $view) {
 
 $router->get('/create/part', function (View $view) {
     return $view->make('create_part_form');
+});
+
+$router->get('/', function (View $view) {
+    return $view->make('default_page_view');
 });
 
 #TEST ROUTES
