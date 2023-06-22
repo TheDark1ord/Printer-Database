@@ -45,12 +45,13 @@ class CreationController
     #Add new part to the database
     public function part(ServerRequest $request) {
         $data = $request->getParsedBody();
+
         # This field is in json form but transmitted as string, thus we should decode it first
         $data["Supported"] = json_decode($data["Supported"]);
 
         if (!testRequired($data, ["PartName", "ShipmentDate", "PartType", "Count", "Supported"])) {
-            #return new JsonResponse($data, 400);
-            return new TextResponse("Request missing required field(s)", 400);
+            return new JsonResponse($data, 400);
+            #return new TextResponse("Request missing required field(s)", 400);
         }
 
         $same_parts = Part::select(["PartName" => $data["PartName"]]);

@@ -1,7 +1,7 @@
 <meta charset=utf-8>
 <h1>Новая поставка</h1>
 <div>
-    <form action="/create/part" method="post">
+    <form action="/create/part" method="post" id="form">
         <input type="text" placeholder="Название детали" name="PartName"><br>
         <input type="text" placeholder="Тип детали" name="PartType"><br>
 
@@ -12,13 +12,51 @@
         <input type="datetime-local" id="shipment-date" name="ShipmentDate"><br>
 
         <label for="Supported">Введите принтеры, для которых подходит данная деталь</label><br>
-        <input type="hidden" name="Supported" id="Supported"
-            value="[
+        <input type="hidden" name="Supported" id="Supported" value="[
                 {&quot;Model&quot;:&quot;EPSON&quot;, &quot;Original&quot;:&quot;true&quot;},
                 {&quot;Model&quot;:&quot;CANON&quot;, &quot;Original&quot;:&quot;false&quot;}
                 ]"><br>
 
+        <textarea id="supported-text" onchange="updateJSON()" rows="5" cols="25"></textarea><br>
+        <script>
+            function updateJSON() {
+                let text = document.getElementById("supported-text").value;
+                let json = "["
 
-        <input type="Submit">
+                var splitted_text = text.replaceAll("\n", "").replaceAll(" ", "").split(';');
+
+                splitted_text.forEach(element => {
+                    if (element === '') {
+                        return;
+                    }
+
+                    let split = element.split("-");
+                    let to_append = {};
+
+                    to_append["Model"] = split[0];
+                    if (split[1] == "O") {
+                        to_append["Original"] = true;
+                    } else {
+                        to_append["Original"] = false;
+                    }
+
+                    let to_append_string = `{"Model" : "${to_append["Model"]}", "Original" : "${to_append["Original"]}"},`;
+
+                    json = json.concat(to_append_string);
+                });
+
+                json = json.slice(0, -1).concat(']');
+
+                document.getElementById("Supported").value = json;
+                console.log(json);
+            }
+
+            function sendForm() {
+                updateJSON();
+                document.getElementById("form").submit();
+            }
+        </script>
+
+        <input type="button" onclick="sendForm()" text="Submit">
     </form>
 </div>
