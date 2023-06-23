@@ -8,4 +8,4 @@ CREATE TABLE IF NOT EXISTS parts (
     FOREIGN KEY (PartType) REFERENCES part_types(ID)
 );
 
-ALTER TABLE `parts` ADD UNIQUE `unique_index`(`PartName`, `ShipmentDate`);
+ALTER TABLE `parts` ADD UNIQUE `unique_index`(`PartName`, `ShipmentDate`) ON CONFLICT REPLACE;

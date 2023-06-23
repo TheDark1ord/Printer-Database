@@ -11,44 +11,71 @@
         <label for="ShipmentDate">Когда поставили</label>
         <input type="datetime-local" id="shipment-date" name="ShipmentDate"><br>
 
-        <label for="Supported">Введите принтеры, для которых подходит данная деталь</label><br>
         <input type="hidden" name="Supported" id="Supported" value="[
-                {&quot;Model&quot;:&quot;EPSON&quot;, &quot;Original&quot;:&quot;true&quot;},
-                {&quot;Model&quot;:&quot;CANON&quot;, &quot;Original&quot;:&quot;false&quot;}
-                ]"><br>
+            {&quot;Model&quot;:&quot;EPSON&quot;, &quot;Original&quot;:&quot;true&quot;},
+            {&quot;Model&quot;:&quot;CANON&quot;, &quot;Original&quot;:&quot;false&quot;}
+            ]"><br>
 
-        <textarea id="supported-text" onchange="updateJSON()" rows="5" cols="25"></textarea><br>
+        <h4 style="margin:0">Введите принтеры, для которых подходит данная деталь:</h4><br>
+        <table id="supported-table">
+            <thead>
+                <tr>
+                    <th abbr="Model">Модель принтера</th>
+                    <th abbr="Original">Оригинал</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td colspan="2"><input type="button" value="Новый ряд" onclick="addRow()"></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <template id="supported-table_row-template">
+            <tr class="data">
+                <td><input type="text" id="model"></td>
+                <td><input type="checkbox" id="isOriginal"></td>
+            </tr>
+        </template>
+
+        <input type="button" onclick="sendForm()" value="Отправить" style="margin-top:1em">
+
         <script>
+            addRow();
+            addRow();
+
+            function addRow() {
+                let tbody = document.querySelector("tbody");
+                let template = document.getElementById("supported-table_row-template");
+
+                const new_row = template.content.cloneNode(true);
+                tbody.insertBefore(new_row, tbody.childNodes[tbody.childNodes.length - 2]);
+            }
+
             function updateJSON() {
-                let text = document.getElementById("supported-text").value;
-                let json = "["
+                let tbody = document.querySelector("tbody");
+                let rows = tbody.querySelectorAll("tr.data");
 
-                var splitted_text = text.replaceAll("\n", "").replaceAll(" ", "").split(';');
+                let headers = [];
+                document.querySelectorAll("th").forEach((header) => {headers.push(header.abbr)});
 
-                splitted_text.forEach(element => {
-                    if (element === '') {
+                let data = [];
+                rows.forEach(function (value) {
+                    let new_data = {};
+                    let cells = value.querySelectorAll("input");
+
+                    if (cells[0].value === "") {
                         return;
                     }
 
-                    let split = element.split("-");
-                    let to_append = {};
+                    new_data[headers[0]] = cells[0].value;
+                    new_data[headers[1]] = cells[1].checked;
 
-                    to_append["Model"] = split[0];
-                    if (split[1] == "O") {
-                        to_append["Original"] = true;
-                    } else {
-                        to_append["Original"] = false;
-                    }
-
-                    let to_append_string = `{"Model" : "${to_append["Model"]}", "Original" : "${to_append["Original"]}"},`;
-
-                    json = json.concat(to_append_string);
+                    data.push(new_data);
                 });
-
-                json = json.slice(0, -1).concat(']');
-
-                document.getElementById("Supported").value = json;
-                console.log(json);
+                document.getElementById("Supported").value = JSON.stringify(data);
+                console.log(document.getElementById("Supported").value);
             }
 
             function sendForm() {
@@ -57,6 +84,44 @@
             }
         </script>
 
-        <input type="button" onclick="sendForm()" value="Отправить">
+<style>
+            thead,
+            tfoot {
+                background-color: #808080;
+                color: #fff;
+            }
+
+            tbody {
+                background-color: #d1d1d1;
+            }
+
+            caption {
+                padding: 10px;
+                caption-side: bottom;
+            }
+
+            table {
+                border-collapse: collapse;
+                border: 2px solid rgb(200, 200, 200);
+                letter-spacing: 1px;
+                font-family: sans-serif;
+                font-size: 0.8rem;
+            }
+
+            td,
+            th {
+                border: 1px solid rgb(190, 190, 190);
+                padding: 5px 10px;
+            }
+
+            td {
+                text-align: center;
+            }
+
+            input {
+                margin-top: 0.25em;
+            }
+        </style>
+
     </form>
 </div>
