@@ -50,8 +50,8 @@ class CreationController
         $data["Supported"] = json_decode($data["Supported"]);
 
         if (!testRequired($data, ["PartName", "ShipmentDate", "PartType", "Count", "Supported"])) {
-            return new JsonResponse($data, 400);
-            #return new TextResponse("Request missing required field(s)", 400);
+            #return new JsonResponse($data, 400);
+            return new TextResponse("Request missing required field(s)", 400);
         }
 
         $same_parts = Part::select(["PartName" => $data["PartName"]]);

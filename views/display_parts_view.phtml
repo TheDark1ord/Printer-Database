@@ -1,0 +1,19 @@
+<h1>Найденные запчасти<h1>
+
+<table>
+    <tr>
+        <th>Название запчасти</th>
+        <th>Категория</th>
+        <th>Оригинал</th>
+    </tr>
+
+    <?php echo gettype($parts); ?>
+
+    <?php foreach ($parts as $part): ?>
+
+        <tr>
+            <td><?php echo $part->PartName ?></td>
+            <td><?php echo $part->PartType ?></td>
+            <td><?php echo $part->IsOriginal ? "Да" : "Нет" ?></td>
+        </tr>
+    <?php endforeach ?>
