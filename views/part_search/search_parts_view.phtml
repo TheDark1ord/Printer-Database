@@ -1,0 +1,17 @@
+<h1>Найти запчасти</h1>
+<form action="/get/parts/" method="GET" id="main-form">
+    <input type="text" placeholder="Модель принтера" name="PrinterModel" success>
+    <input type="text" placeholder="Тип детали" name="PartType">
+    <input type="submit">
+
+    <table style="visibility:hidden" id="display-table">
+        <tr>
+            <th>Название запчасти</th>
+            <th>Категория</th>
+            <th>Дата поставки</th>
+            <th>Оригинал</th>
+        </tr>
+    </table>
+
+    <h2 style="visibility:hidden; position:absolute; top:75px; left:15px;" id="not-found">Ничего не найдено<h2>
+    <h2 style="visibility:hidden; position:absolute; top:75px; left:15px;" id="printer-not-found">Принтер не найден<h2>

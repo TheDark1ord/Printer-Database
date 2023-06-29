@@ -12,12 +12,6 @@
             return "parts";
         }
 
-        # Get an array of all printers int which this part can be installed
-        # pertain specifies if only original, non original or both types of
-        # parts should be selected
-        public function getPrinters() {
-        }
-
         public $ID;
         public $PartName;
         public $ShipmentDate;

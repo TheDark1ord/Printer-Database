@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS part_use_log (
+    ID INT NOT NULL AUTO_INCREMENT,
+    PartName varchar(255) NOT NULL,
+    PrinterNumber varchar(255) NOT NULL,
+    UseTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY(ID)
+);

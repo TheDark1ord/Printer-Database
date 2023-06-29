@@ -58,7 +58,7 @@
                 let rows = tbody.querySelectorAll("tr.data");
 
                 let headers = [];
-                document.querySelectorAll("th").forEach((header) => {headers.push(header.abbr)});
+                document.querySelectorAll("th").forEach((header) => { headers.push(header.abbr) });
 
                 let data = [];
                 rows.forEach(function (value) {
@@ -70,7 +70,7 @@
                     }
 
                     new_data[headers[0]] = cells[0].value;
-                    new_data[headers[1]] = cells[1].checked;
+                    new_data[headers[1]] = cells[1].checked.toString();
 
                     data.push(new_data);
                 });
@@ -84,7 +84,7 @@
             }
         </script>
 
-<style>
+        <style>
             thead,
             tfoot {
                 background-color: #808080;

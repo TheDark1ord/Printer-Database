@@ -1,6 +1,6 @@
 <h1>Найти запчасти</h1>
 <form action="/get/parts/" method="GET" id="main-form">
-    <input type="text" placeholder="Модель принтера" name="PrinterModel" success>
+    <input type="text" placeholder="Модель принтера" name="PrinterModel">
     <input type="text" placeholder="Тип детали" name="PartType">
     <input type="submit">
 
@@ -13,8 +13,12 @@
         </tr>
     </table>
 
+    <h2 style="visibility:hidden; position:absolute; top:75px; left:15px;" id="not-found">Ничего не найдено<h2>
+
     <style>
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid black;
         }
 
@@ -34,7 +38,7 @@
             const formData = new FormData(evt.target);
             var params = `PrinterModel=${formData.get("PrinterModel")}&PartType=${formData.get("PartType")}`
 
-            xhr.open("GET", "/get/parts"+'?'+params, true);
+            xhr.open("GET", "/get/parts" + '?' + params, true);
             xhr.send(formData);
 
             xhr.onload = function () {
@@ -43,14 +47,15 @@
                 }
 
                 displayResponse(xhr.response);
-
             };
         });
 
         function displayResponse(response) {
             const table = document.getElementById("display-table");
+            const not_found = document.getElementById("not-found");
 
             table.style.visibility = "visible";
+            not_found.style.visibility = "hidden";
 
             var rowCount = table.rows.length;
             for (var i = 1; i < rowCount; i++) {
@@ -58,8 +63,12 @@
             }
 
             var json_response = JSON.parse(response);
-            console.log(response);
-            console.log(json_response);
+
+            if (isEmpty(json_response)) {
+                not_found.style.visibility = "visible";
+                table.style.visibility = "hidden";
+                return;
+            }
 
             json_response.forEach(element => {
                 var row = table.insertRow(-1);
@@ -74,6 +83,16 @@
                 cell3.innerHTML = element.isOriginal ? "Да" : "Нет";
                 cell4.innerHTML = element.ShipmentDate;
             });
+
+            function isEmpty(obj) {
+                for (var prop in obj) {
+                    if (Object.prototype.hasOwnProperty.call(obj, prop)) {
+                        return false;
+                    }
+                }
+
+                return true
+            }
         }
     </script>
 </form>
