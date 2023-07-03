@@ -14,7 +14,8 @@
 
         public $ID;
         public $PartName;
-        public $ShipmentDate;
+        public $Manufacturer;
+        public $Description;
         public $PartType;
         public $Count;
     }

@@ -1,9 +1,17 @@
+<IfModule mod_headers.c>
+    Header add Access-Control-Allow-Headers "origin, content-type"
+    Header add Access-Control-Allow-Methods "GET, POST, OPTIONS"
+</IfModule>
+
 <IfModule mod_rewrite.c>
     <IfModule mod_negotiation.c>
         Options -MultiViews
     </IfModule>
 
     RewriteEngine On
+
+    RewriteCond %{REQUEST_METHOD} OPTIONS
+    RewriteRule ^(.*)$ blank.html [QSA,L]
 
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^(.*)/$ /$1 [L,R=301]
@@ -12,6 +20,3 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
-
-php_flag display_errors on
-php_value error_reporting -1

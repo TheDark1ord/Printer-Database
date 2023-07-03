@@ -47,7 +47,7 @@ class CreationController
         ]);
         $validation->validate();
         if ($validation->fails()) {
-            return new JsonResponse($validation->errors()->firstOfAll(), 500);
+            return new TextResponse(print_r($validation->errors()->firstOfAll(), true), 500);
         }
 
         $printer = new Printer;
@@ -61,112 +61,93 @@ class CreationController
     }
 
     #Add new part to the database
-    public function part(ServerRequest $request)
+    public function shipment(ServerRequest $request)
     {
         $data = $request->getParsedBody();
-        # This field is in json form but transmitted as string, thus we should decode it first
-        $data["Supported"] = json_decode($data["Supported"]);
+        $data["Parts"] = json_decode($data["Parts"], true);
+
         $validatior = new Validator;
         $validation = $validatior->make($data, [
-            'PartName' => 'required',
             'ShipmentDate' => 'required|date',
-            'Count' => 'required|numeric|min:1',
-            'Supported' => 'array',
+            'Parts' => 'array|required',
+            'Parts.*.PartName' => 'required',
+            'Parts.*.Manufacturer' => 'required',
+            'Parts.*.PartType' => 'required|numeric',
+            'Parts.*.Count' => 'required|numeric|min:1',
+            'Parts.*.Supported' => 'array|required',
+            'Parts.*.Supported.*.Model' => 'required',
+            'Parts.*Supported.*.Original' => 'required'
         ]);
         $validation->validate();
         if ($validation->fails()) {
-            return new JsonResponse($validation->errors()->firstOfAll(), 500);
-        }
-        $same_parts = Part::select(["PartName" => $data["PartName"], "ShipmentDate" => $data["ShipmentDate"]]);
-        $supported_printers = [];
-        foreach ($data["Supported"] as $supported) {
-            array_push($supported_printers, $supported->Model);
+            return new TextResponse(print_r($validation->errors()->firstOfAll(), true), 400);
         }
 
-        # If the part with the same name has the same supported printers, then we increace the count of this part
-        # Else we create different part with the same name
-        //$matched_part = null;
-        //if (count($same_parts) > 0) {
-        //    foreach ($same_parts as $part) {
-        //        $matched_printes = PartAssociasion::select(["PartID" => $part->ID]);
-
-        //        $full_match = true;
-        //        if (count($matched_printes) != count($supported_printers)) {
-        //            $full_match = false;
-        //            continue;
-        //        }
-        //        foreach ($matched_printes as $matched) {
-        //            if (!in_array($matched->PrinterModel, $supported_printers)) {
-        //                break;
-        //            }
-        //        }
-        //        if ($full_match) {
-        //            $matched_part = $part;
-        //            break;
-        //        }
-        //    }
-
-        //    # Simply add shipment to count
-        //    if ($matched_part != null) {
-        //        $matched_part->Count += $data["Count"];
-        //        $matched_part->save();
-        //    }
-        //}
-        //TODO: delete if not needed
-
-        $matched_part = null;
-        if (count($same_parts) > 0) {
-            $matched_part = getFirstMatch($same_parts);
-
-            $matched_part->Count += $data["Count"];
-            $matched_part->save();
-        }
-
-        if ($matched_part == null) {
-            $new_part = new Part();
-
-            $new_part->PartName = $data["PartName"];
-            $new_part->ShipmentDate = $data["ShipmentDate"];
-            $new_part->Count = $data["Count"];
-
-            #Если в качестве параметра передается название типа, а не ID
-            #$part_type = PartType::select(["PartType" => $data["PartType"]], null, ["PartType", "ID"]);
-
-            $new_part->PartType = $data["PartType"];
-
-            try {
-                $new_part->save();
-            } catch (Exception $e) {
-                return new TextResponse($e->getMessage() . " in new_part", 500);
+        foreach ($data["Parts"] as $part) {
+            if (PartType::get($part["PartType"]) == null) {
+                return new TextResponse("PartType with ID {$part['PartType']} does not exist", 400);
             }
 
-            $new_part_id = getFirstMatch(
-                Part::select(
-                    ["PartName" => $new_part->PartName],
-                    ["ID" => "DESC"],
-                    ["ID"],
-                    1
-                )
-            )->ID;
+            $same_parts = Part::select(["PartName" => $part["PartName"], "Manufacturer" => $part["Manufacturer"]]);
+            $supported_printers = [];
 
-            #Create new assosiacions
-            foreach ($data["Supported"] as $supported) {
-                $new_association = new PartAssociasion();
+            foreach ($part["Supported"] as $supported) {
+                array_push($supported_printers, $supported["Model"]);
+            }
 
-                $new_association->PartID = $new_part_id;
-                $new_association->PrinterModel = $supported->Model;
+            # Если запчасть с этим названием уже была найдена
+            if (count($same_parts) > 0) {
+                $matched_part = getFirstMatch($same_parts);
 
-                $model_match = getFirstMatch(PrinterModel::select(["Model" => $supported->Model]));
-                if ($model_match != null) {
-                    #Get first element
-                    $new_association->PrinterID = $model_match->ID;
-                }
-                $new_association->IsOriginal = $supported->Original === 'true' ? 1 : 0;
+                $matched_part->Count += $part["Count"];
+                $matched_part->save();
+            } else {
+                $new_part = new Part();
 
+                $new_part->PartName = $part["PartName"];
+                $new_part->Manufacturer = $part["Manufacturer"];
+                $new_part->Count = $part["Count"];
+
+                $new_part->Description = $part["Description"];
+
+                #Если в качестве параметра передается название типа, а не ID
+                #$part_type = PartType::select(["PartType" => $data["PartType"]], null, ["PartType", "ID"]);
+
+                $new_part->PartType = $part["PartType"];
                 try {
-                    $new_association->save();
+                    $new_part->save();
                 } catch (Exception $e) {
-                    return new TextResponse($e->getMessage() . "in new_association", 500);
+                    return new TextResponse($e->getMessage() . " in new_part", 500);
+                }
+
+                $new_part_id = getFirstMatch(
+                    Part::select(
+                        ["PartName" => $new_part->PartName],
+                        ["ID" => "DESC"],
+                        ["ID"],
+                        1
+                    )
+                )->ID;
+
+                #Create new assosiacions
+                foreach ($part["Supported"] as $supported) {
+                    $new_association = new PartAssociasion();
+
+                    $new_association->PartID = $new_part_id;
+                    $new_association->PrinterModel = $supported["Model"];
+
+                    $model_match = getFirstMatch(PrinterModel::select(["Model" => $supported["Model"]]));
+                    if ($model_match != null) {
+                        #Get first element
+                        $new_association->PrinterID = $model_match->ID;
+                    }
+                    $new_association->IsOriginal = $supported["Original"] === 'true' ? 1 : 0;
+
+                    try {
+                        $new_association->save();
+                    } catch (Exception $e) {
+                        return new TextResponse($e->getMessage() . "in new_association", 500);
+                    }
                 }
             }
         }

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS parts (
     Manufacturer VARCHAR(255) NOT NULL,
     PartType int NOT NULL,
     Count int NOT NULL,
+    Description VARCHAR(511),
     PRIMARY KEY (ID),
     FOREIGN KEY (PartType) REFERENCES part_types(ID)
 );

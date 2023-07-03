@@ -11,6 +11,8 @@ require_once("Database\\Models\\Printer.php");
 require_once("Database\\Models\\Part.php");
 require_once("utils.php");
 
+# По функциональности похож на RequestController, но в данном случае вместо поиска
+# точного соответствия некоторого поля используется директива LIKE
 class SearchController
 {
     public function part_search(ServerRequest $request)

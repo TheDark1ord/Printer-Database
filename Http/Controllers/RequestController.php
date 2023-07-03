@@ -1,10 +1,8 @@
 <?php
+
 use Database\Models\Printer;
 use Rakit\Validation\Rules\Json;
 use Rakit\Validation\Validator;
-
-header("Access-Control-Allow-Origin: *");
-header("Access-Control-Allow-Headers: *");
 
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\ServerRequest;
@@ -15,6 +13,8 @@ require_once("Database\\Models\\Printer.php");
 require_once("Database\\Models\\Part.php");
 require_once("utils.php");
 
+# Используется для поиска в базе данных записей по точному соответствию некоторого поля
+# Например поиск принтера по его серийному номеру
 class RequestController
 {
     public function part(ServerRequest $request)
@@ -23,23 +23,28 @@ class RequestController
         $validatior = new Validator;
         $validation = $validatior->make($data, [
             'PartName' => 'required',
-            'ShipmentDate' => 'required|date:Y-m-d'
+            'Manufacturer' => 'required'
         ]);
         $validation->validate();
         if ($validation->fails()) {
             return new JsonResponse($validation->errors()->firstOfAll(), 500);
         }
-        $result = Part::select(["PartName" => $data["PartName"], "ShipmentDate" => $data["ShipmentDate"]]);
+        $result = Part::select(["PartName" => $data["PartName"], "Manufacturer" => $data["Manufacturer"]]);
 
         return new JsonResponse(getFirstMatch($result));
     }
 
+
+    # Позволяет получить все запчасти, которые подходят для данного принтера
     public function parts_for_printer(ServerRequest $request)
     {
         $data = $request->getQueryParams();
         $validatior = new Validator;
         $validation = $validatior->make($data, [
             'PrinterModel' => 'required',
+            # Необязательное поле, если оно присутствует,
+            # То поиск будет вестись только для заданного типа запчастей
+            # Если это поле равно пустой строке, то поиск будет вестись по всем запчастям
             'PartType' => 'present'
         ]);
         $validation->validate();
@@ -68,6 +73,7 @@ class RequestController
         return new JsonResponse($parts, 200);
     }
 
+    #Данная функция не принимает аргументов и возвращает все типы запчастей, заданные в базе
     public function types(ServerRequest $request)
     {
         global $conn;

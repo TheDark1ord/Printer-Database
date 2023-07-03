@@ -13,8 +13,12 @@ require_once("Database\\Models\\Part.php");
 require_once("Database\\Models\\PartUse.php");
 require_once("utils.php");
 
+# Используется для редактирования некоторых свойств уже существующих записей
 class EditController
 {
+    # Функция отвечает за использование запчасти:
+    # запчасть с некоторым номером(ID) используют для принтера
+    # с некоторым серийным номером(Serial)
     public function take_part(ServerRequest $request)
     {
         // VALIDATION

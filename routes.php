@@ -24,7 +24,7 @@ $router->setupView(__DIR__ . "/views/");
 
 $router->post('/create/printer_model', [CreationController::class, 'printer_model']);
 $router->post('/create/printer', [CreationController::class, 'printer']);
-$router->post('/create/part', [CreationController::class, 'part']);
+$router->post('/create/shipment', [CreationController::class, 'shipment']);
 $router->post('/create/part-type', [CreationController::class, 'part_type']);
 
 $router->post('/change/take_part', [EditController::class, 'take_part']);
@@ -53,7 +53,6 @@ $router->get('/create/part', function (View $view) {
 $router->get('/', function (View $view) {
     return $view->make('part_search.search_parts_view');
 });
-
 
 #TEST ROUTES
 
