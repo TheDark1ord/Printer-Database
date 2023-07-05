@@ -1,6 +1,8 @@
 <?php
 
 use Database\Models\Printer;
+use Database\Models\Shipment;
+use Database\Models\ShipmentsRelation;
 use Laminas\Diactoros\ServerRequest;
 use Laminas\Diactoros\Response\JsonResponse;
 use Laminas\Diactoros\Response\TextResponse;
@@ -18,6 +20,8 @@ require_once("Database\\Models\\Printer.php");
 require_once("Database\\Models\\Part.php");
 require_once("Database\\Models\\PartType.php");
 require_once("Database\\Models\\PartAssociasion.php");
+require_once("Database\\Models\\Shipment.php");
+require_once("Database\\Models\\ShipmentRelation.php");
 require_once("utils.php");
 
 # This controller handles post requests which add new entries to the tables
@@ -83,17 +87,29 @@ class CreationController
             return new TextResponse(print_r($validation->errors()->firstOfAll(), true), 400);
         }
 
+        $shipment = new Shipment;
+        $shipment->ShipmentDate = $data["ShipmentDate"];
+        // TODO: Может быть в будующем добавить поддержку этого поля
+        $shipment->Info = null;
+        $shipment->save();
+
+        # Так как ID задается автоматически и не обновляется в модели после ее сохранения,
+        # приходится вот так искать ID новой поставки в базе
+        $new_shipment_id = getFirstMatch(
+            Shipment::select(
+                ["ShipmentDate" => $data["ShipmentDate"]],
+                ["ID" => "DESC"],
+                ["ID"],
+                1
+            )
+        )->ID;
+
         foreach ($data["Parts"] as $part) {
             if (PartType::get($part["PartType"]) == null) {
                 return new TextResponse("PartType with ID {$part['PartType']} does not exist", 400);
             }
 
             $same_parts = Part::select(["PartName" => $part["PartName"], "Manufacturer" => $part["Manufacturer"]]);
-            $supported_printers = [];
-
-            foreach ($part["Supported"] as $supported) {
-                array_push($supported_printers, $supported["Model"]);
-            }
 
             # Если запчасть с этим названием уже была найдена
             if (count($same_parts) > 0) {
@@ -101,6 +117,8 @@ class CreationController
 
                 $matched_part->Count += $part["Count"];
                 $matched_part->save();
+
+                $shipment_relation_part_id = $matched_part->ID;
             } else {
                 $new_part = new Part();
 
@@ -128,6 +146,7 @@ class CreationController
                         1
                     )
                 )->ID;
+                $shipment_relation_part_id = $new_part_id;
 
                 #Create new assosiacions
                 foreach ($part["Supported"] as $supported) {
@@ -150,11 +169,17 @@ class CreationController
                     }
                 }
             }
+            $shipment_relation = new ShipmentsRelation;
+            $shipment_relation->Count = $part["Count"];
+            $shipment_relation->PartID = $shipment_relation_part_id;
+            $shipment_relation->ShipmentID = $new_shipment_id;
+            $shipment_relation->save();
         }
     }
 
     public function part_type(ServerRequest $request)
     {
+        // TODO
         echo $request->getAttributes();
     }
 

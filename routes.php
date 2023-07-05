@@ -30,11 +30,13 @@ $router->post('/create/part-type', [CreationController::class, 'part_type']);
 $router->post('/change/take_part', [EditController::class, 'take_part']);
 
 $router->get('/get/part', [RequestController::class, 'part']);
+$router->get('/get/shipments', [RequestController::class, 'shipments']);
+$router->get('/get/use_log', [RequestController::class, 'use_log']);
 $router->get('/get/printer', [RequestController::class, 'printer']);
 $router->get("/get/parts_for_printer", [RequestController::class, 'parts_for_printer']);
 $router->get('/get/types', [RequestController::class, 'types']);
 
-$router->get('/get/search/parts', [SearchController::class, 'part_search']);
+$router->get('/get/search/parts', [RequestController::class, 'part_search']);
 $router->get('/get/search/printer_models', [SearchController::class, 'printer_model_search']);
 $router->get('/get/search/printers', [SearchController::class, 'printer_search']);
 

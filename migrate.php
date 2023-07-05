@@ -15,7 +15,9 @@ $database_tables = [
     "parts",
     "parts_association",
     "part_use_log",
-    "printers"
+    "printers",
+    "shipments",
+    "shipments_relation"
 ];
 # If you wat to add the check for missing tables
 #$table_check_query = "SELECT TABLE_NAME FROM information_schema.tables WHERE table_schema = '%s'";
@@ -30,7 +32,7 @@ foreach ($database_tables as $table) {
 
     $err = mysqli_error($conn);
     if ($err != null) {
-        echo $err . "<br>";
+        echo "Error in file: `" . $table . "` " . $err . "<br>";
     }
 
     mysqli_next_result($conn);

@@ -1,0 +1,6 @@
+CREATE TABLE IF NOT EXISTS `shipments` (
+    ID BIGINT AUTO_INCREMENT NOT NULL,
+    ShipmentDate DATE NOT NULL,
+    Info VARCHAR(255),
+    PRIMARY KEY (ID)
+)

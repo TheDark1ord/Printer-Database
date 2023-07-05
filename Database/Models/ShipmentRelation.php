@@ -1,20 +1,21 @@
 <?php
     namespace Database\Models;
+
     use Aternos\Model\Driver\Mysqli\Mysqli;
 
-    class PartUse extends \Aternos\Model\GenericModel {
+    class ShipmentsRelation extends \Aternos\Model\GenericModel {
         protected static bool $registry = true;
         protected static array $drivers = [
             Mysqli::ID,
         ];
 
         public static function getName(): string {
-            return "part_use_log";
+            return "shipments_relation";
         }
 
         public $ID;
+        public $ShipmentID;
         public $PartID;
-        public $PrinterSerial;
-        public $UseTime;
+        public $Count;
     }
 ?>

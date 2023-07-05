@@ -18,6 +18,7 @@ if (!$conn) {
     die('Could not connect to the database');
 }
 
+# В данном файле задаются все URL HTTP запросов и чем они обрабатываются
 include("routes.php");
 
 $conn->close();

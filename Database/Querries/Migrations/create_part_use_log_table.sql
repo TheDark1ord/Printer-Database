@@ -1,7 +1,9 @@
 CREATE TABLE IF NOT EXISTS part_use_log (
-    ID INT NOT NULL AUTO_INCREMENT,
-    PartName varchar(255) NOT NULL,
-    PrinterNumber varchar(255) NOT NULL,
+    ID BIGINT NOT NULL AUTO_INCREMENT,
+    PartID BIGINT NOT NULL,
+    PrinterSerial varchar(255) NOT NULL,
     UseTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    PRIMARY KEY(ID)
+    PRIMARY KEY(ID),
+    FOREIGN KEY (PartID) REFERENCES parts(ID),
+    FOREIGN KEY (PrinterSerial) REFERENCES printers(SerialNumber)
 );

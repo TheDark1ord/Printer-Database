@@ -15,43 +15,6 @@ require_once("utils.php");
 # точного соответствия некоторого поля используется директива LIKE
 class SearchController
 {
-    public function part_search(ServerRequest $request)
-    {
-        global $conn;
-
-        $data = $request->getQueryParams();
-        $query_info = "SELECT `parts`.*, `part_types`.`PartType` FROM `parts`
-            LEFT JOIN `part_types` ON `parts`.`PartType` = `part_types`.`ID` WHERE `parts`.`ID` = ?";
-        $query_printers = 'SELECT `PrinterModel`, `isOriginal`, (`PrinterID` IS NOT NULL) AS `InDatabase`
-            FROM `parts_association` WHERE `PartID` = ?';
-
-        $stmt = $conn->prepare($query_info);
-
-        $stmt->bind_param("i", $data["ID"]);
-        $stmt->execute();
-
-        $result = $stmt->get_result();
-        $info = getFirstMatch($result);
-
-        mysqli_next_result($conn);
-
-        $stmt = $conn->prepare($query_printers);
-        if (gettype($stmt) == "boolean") {
-            throw new JsonException($conn->error);
-        }
-        $stmt->bind_param("i", $data["ID"]);
-
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        $printer_models = [];
-        foreach ($result as $r) {
-            $printer_models[] = $r;
-        }
-
-        return new JsonResponse(["info" => $info, "models" => $printer_models]);
-    }
-
     public function printer_search(ServerRequest $request)
     {
         $data = $request->getQueryParams();
